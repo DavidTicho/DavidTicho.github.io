@@ -22,13 +22,14 @@ exit_btn.onclick = ()=>{
 
 // if continueQuiz button clicked
 continue_btn.onclick = ()=>{
-    info_box.classList.remove("activeInfo"); //hide info box
-    quiz_box.classList.add("activeQuiz"); //show quiz box
-    let pri=random(0,questions.length-1)
-    showQuetions(pri); //calling showQestions function
-    queCounter(1); //passing 1 parameter to queCounter
-    startTimer(15); //calling startTimer function
-    startTimerLine(0); //calling startTimerLine function
+    iniciar();
+  //  info_box.classList.remove("activeInfo"); //hide info box
+  //  quiz_box.classList.add("activeQuiz"); //show quiz box
+  //  let pri=random(0,questions.length-1)
+  //  showQuetions(0); //calling showQestions function
+  //  queCounter(1); //passing 1 parameter to queCounter
+  //  startTimer(15); //calling startTimer function
+  //  startTimerLine(0); //calling startTimerLine function
 }
 
 let timeValue =  15;
@@ -38,12 +39,19 @@ let userScore = 0;
 let counter;
 let counterLine;
 let widthValue = 0;
+let cc=0;
+let max=15;
 
 const restart_quiz = result_box.querySelector(".buttons .restart");
 const quit_quiz = result_box.querySelector(".buttons .quit");
 
 // if restartQuiz button clicked
 restart_quiz.onclick = ()=>{
+  cc++;
+    iniciar();
+}
+
+function iniciar(){
     quiz_box.classList.add("activeQuiz"); //show quiz box
     result_box.classList.remove("activeResult"); //hide result box
     timeValue = 15; 
@@ -61,6 +69,7 @@ restart_quiz.onclick = ()=>{
     timeText.textContent = "Tiempo restante"; //change the text of timeText to Time Left
     next_btn.classList.remove("show"); //hide the next button
 }
+
 function random(min, max) {
     return Math.floor((Math.random() * (max - min + 1)) + min);
 }
@@ -74,8 +83,10 @@ const bottom_ques_counter = document.querySelector("footer .total_que");
 
 // if Next Que button clicked
 next_btn.onclick = ()=>{
-    if(que_count < questions.length - 1){ //if question count is less than total question length
+cc++;
+    if(cc< max){ //if question count is less than total question length
        // que_count++; //increment the que_count value
+       
         que_numb++; //increment the que_numb value
         que_count=random(0,questions.length-1)
         showQuetions(que_count); //calling showQestions function
@@ -158,15 +169,15 @@ function showResult(){
     const scoreText = result_box.querySelector(".score_text");
     if (userScore > 10){ // if user scored more than 3
         //creating a new span tag and passing the user score number and total question number
-        let scoreTag = '<span>Y felicidades tienes<p>'+ userScore +'</p> puntos <p>'+ questions.length +'</p></span>';
+        let scoreTag = '<span>Y felicidades tienes<p>'+ userScore +'</p> puntos <p>'+ max +'</p></span>';
         scoreText.innerHTML = scoreTag;  //adding new span tag inside score_Text
     }
     else if(userScore > 5){ // if user scored more than 1
-        let scoreTag = '<span>Felicidades tienes <p>'+ userScore +'</p> puntos <p>'+ questions.length +'</p></span>';
+        let scoreTag = '<span>Felicidades tienes <p>'+ userScore +'</p> puntos <p>'+ max +'</p></span>';
         scoreText.innerHTML = scoreTag;
     }
     else{ // if user scored less than 1
-        let scoreTag = '<span>Lo siento, solo tienes <p>'+ userScore +'</p> puntos <p>'+ questions.length +'</p></span>';
+        let scoreTag = '<span>Lo siento, solo tienes <p>'+ userScore +'</p> puntos <p>'+ max +'</p></span>';
         scoreText.innerHTML = scoreTag;
     }
 }
@@ -213,6 +224,6 @@ function startTimerLine(time){
 
 function queCounter(index){
     //creating a new span tag and passing the question number and total question
-    let totalQueCounTag = '<span><p>'+ index +'</p> of <p>'+ questions.length +'</p> Questions</span>';
+    let totalQueCounTag = '<span><p>'+ index +'</p> de <p>'+ max +'</p> preguntas</span>';
     bottom_ques_counter.innerHTML = totalQueCounTag;  //adding new span tag inside bottom_ques_counter
 }
