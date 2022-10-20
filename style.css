@@ -38,8 +38,8 @@ body{
 }
 
 .start_btn button{
-    font-size: 25px;
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 400;
     color: #007bff;
     padding: 15px 30px;
     outline: none;
@@ -50,7 +50,7 @@ body{
 }
 
 .info_box{
-    width: 540px;
+    width: 380px;
     background: #fff;
     border-radius: 5px;
     transform: translate(-50%, -50%) scale(0.9);
@@ -108,7 +108,7 @@ body{
 }
 
 .quiz_box{
-    width: 350px;
+    width: 380px;
     background: #fff;
     border-radius: 5px;
     transform: translate(-50%, -50%) scale(0.9);
@@ -131,8 +131,8 @@ body{
 }
 
 .quiz_box header .title{
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 500;
 }
 
 .quiz_box header .timer{
@@ -182,8 +182,8 @@ section{
 }
 
 section .que_text{
-    font-size: 25px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 500;
 }
 
 section .option_list{
@@ -278,10 +278,10 @@ footer .total_que span p:first-child{
 }
 
 footer button{
-    height: 40px;
-    padding: 0 13px;
+    height: 30px;
+    padding: 0 5px;
     font-size: 18px;
-    font-weight: 400;
+    font-weight: 300;
     cursor: pointer;
     border: none;
     outline: none;
