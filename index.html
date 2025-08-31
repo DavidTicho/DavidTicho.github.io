@@ -102,6 +102,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
+            margin-bottom: 20px;
         }
 
         @media (max-width: 600px) {
@@ -153,6 +154,22 @@
             justify-content: center;
             align-items: center;
             font-weight: bold;
+        }
+
+        .explanation-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .explanation-container h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .controls {
@@ -224,20 +241,6 @@
             margin-bottom: 30px;
             max-width: 600px;
             line-height: 1.6;
-        }
-
-        .explanation {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            text-align: left;
-            max-width: 600px;
-        }
-
-        .explanation h3 {
-            color: #ffcc00;
-            margin-bottom: 10px;
         }
 
         .progress-bar {
@@ -335,6 +338,11 @@
                     <div class="option-text">Depende de la solución</div>
                 </div>
             </div>
+            
+            <div class="explanation-container" id="explanation-container">
+                <h3><i class="fas fa-info-circle"></i> Explicación</h3>
+                <p id="explanation-text"></p>
+            </div>
         </div>
         
         <div class="controls">
@@ -346,11 +354,6 @@
             <div class="score" id="final-score">0</div>
             <div class="message" id="result-message">¡Buen trabajo! Sigue estudiando para mejorar aún más.</div>
             <button id="restart-btn"><i class="fas fa-redo"></i> Volver a Jugar</button>
-            
-            <div class="explanation">
-                <h3><i class="fas fa-lightbulb"></i> ¿Sabías qué?</h3>
-                <p>Las soluciones son mezclas homogéneas donde el soluto se disuelve en el disolvente. El disolvente siempre está en mayor proporción. Por ejemplo, en una solución de sal en agua, el agua es el disolvente y la sal es el soluto.</p>
-            </div>
         </div>
     </div>
     
@@ -816,11 +819,13 @@
         const resultMessage = document.getElementById('result-message');
         const progressBar = document.getElementById('progress');
         const feedbackElement = document.getElementById('feedback');
+        const explanationContainer = document.getElementById('explanation-container');
+        const explanationText = document.getElementById('explanation-text');
         
         let currentQuestionIndex = 0;
         let score = 0;
         let timer;
-        let timeLeft = 15;
+        let timeLeft = 30;
         let selectedOption = null;
         let shuffledQuestions = [];
 
@@ -858,11 +863,14 @@
                 optionsContainer.appendChild(optionElement);
             });
             
+            // Ocultar explicación
+            explanationContainer.style.display = 'none';
+            
             // Actualizar barra de progreso
             progressBar.style.width = `${((currentQuestionIndex) / shuffledQuestions.length) * 100}%`;
             
             // Reiniciar temporizador
-            timeLeft = 30;
+            timeLeft = 50;
             timerElement.textContent = timeLeft;
             clearInterval(timer);
             startTimer();
@@ -903,6 +911,10 @@
                     opt.classList.add('incorrect');
                 }
             });
+            
+            // Mostrar explicación
+            explanationText.textContent = shuffledQuestions[currentQuestionIndex].explanation;
+            explanationContainer.style.display = 'block';
             
             // Actualizar puntaje
             if (correct) {
@@ -957,6 +969,10 @@
                     opt.classList.add('correct');
                 }
             });
+            
+            // Mostrar explicación
+            explanationText.textContent = shuffledQuestions[currentQuestionIndex].explanation;
+            explanationContainer.style.display = 'block';
             
             // Mostrar feedback
             showFeedback(false);
