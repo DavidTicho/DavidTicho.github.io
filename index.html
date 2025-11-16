@@ -1,1037 +1,435 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preguntas sobre Soluciones QMC</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz de Ciencias</title>
+  <style>
+    /* Reset y base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.4em;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
 
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    /* Menú principal */
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+    }
+    .card {
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 30px 20px;
+      width: 200px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .card:hover {
+      transform: translateY(-10px);
+      background: rgba(255,255,255,0.25);
+    }
+    .card h2 {
+      margin-bottom: 15px;
+      font-size: 1.6em;
+    }
+    .card.bio { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .card.fis { background: linear-gradient(135deg, #8e2de2, #4a00e0); }
+    .card.qui { background: linear-gradient(135deg, #ff5e62, #ff9966); }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            color: white;
-        }
+    /* Quiz layout */
+    #quiz {
+      display: none;
+      background: rgba(0,0,0,0.5);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .subject-indicator {
+      font-weight: bold;
+      font-size: 1.1em;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.2);
+    }
+    .progress-bar {
+      height: 10px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 5px;
+      margin: 15px 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #4caf50;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .timer {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #ffcc00;
+    }
+    #question {
+      font-size: 1.4em;
+      margin: 20px 0;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .option {
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-align: center;
+    }
+    .option:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    .option.correct {
+      background: #4caf50 !important;
+      color: white;
+    }
+    .option.incorrect {
+      background: #f44336 !important;
+      color: white;
+    }
+    #score-display {
+      text-align: center;
+      font-size: 1.2em;
+      margin: 15px 0;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      background: #4caf50;
+      color: white;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #45a049;
+    }
+    #back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
 
-        .header {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-        }
+    /* Resultados */
+    #results {
+      display: none;
+      text-align: center;
+      background: rgba(0,0,0,0.5);
+      padding: 40px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+    #final-score {
+      font-size: 2em;
+      margin: 20px 0;
+    }
+    #message {
+      font-size: 1.4em;
+      margin: 20px 0;
+    }
+    .explanation {
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 10px;
+      text-align: left;
+    }
 
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .quiz-info {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.2);
-            font-size: 1.1rem;
-        }
-
-        .timer-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .timer {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 1.3rem;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-
-        .question-container {
-            padding: 30px;
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .question-number {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #ffcc00;
-        }
-
-        .question-text {
-            font-size: 1.4rem;
-            margin-bottom: 30px;
-            line-height: 1.4;
-        }
-
-        .options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 600px) {
-            .options {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .option {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .option:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-3px);
-        }
-
-        .option.selected {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: #4caf50;
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
-        }
-
-        .option.correct {
-            background: rgba(76, 175, 80, 0.3);
-            border-color: #4caf50;
-        }
-
-        .option.incorrect {
-            background: rgba(244, 67, 54, 0.3);
-            border-color: #f44336;
-        }
-
-        .option-prefix {
-            background: rgba(255, 255, 255, 0.2);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-        }
-
-        .explanation-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .explanation-container h3 {
-            color: #ffcc00;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .controls {
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        button {
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #next-btn {
-            background: linear-gradient(to right, #4caf50, #8bc34a);
-            color: white;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-        }
-
-        #next-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
-        }
-
-        #restart-btn {
-            background: linear-gradient(to right, #2196f3, #03a9f4);
-            color: white;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
-        }
-
-        #restart-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
-        }
-
-        .result-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        .result-container h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #ffcc00;
-        }
-
-        .score {
-            font-size: 5rem;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #4caf50;
-            text-shadow: 0 0 20px rgba(76, 175, 80, 0.7);
-        }
-
-        .message {
-            font-size: 1.4rem;
-            margin-bottom: 30px;
-            max-width: 600px;
-            line-height: 1.6;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            background: linear-gradient(to right, #4caf50, #8bc34a);
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-
-        .feedback {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transform: translateX(200%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .feedback.show {
-            transform: translateX(0);
-        }
-
-        .feedback.correct {
-            background: rgba(76, 175, 80, 0.9);
-            color: white;
-        }
-
-        .feedback.incorrect {
-            background: rgba(244, 67, 54, 0.9);
-            color: white;
-        }
-
-        .pulse {
-            animation: pulse 0.5s ease;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-    </style>
+    /* Responsive */
+    @media (max-width: 600px) {
+      .card { width: 90%; }
+      h1 { font-size: 2em; }
+      #question { font-size: 1.2em; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-flask"></i> Preguntas sobre Soluciones</h1>
-            <p>¡Demuestra tus conocimientos sobre soluciones químicas!</p>
-        </div>
-        
-        <div class="quiz-info">
-            <div class="question-count">Pregunta: <span id="current-question">1</span>/<span id="total-questions">40</span></div>
-            <div class="timer-container">
-                <i class="fas fa-clock"></i>
-                <div class="timer" id="timer">15</div>
-            </div>
-            <div class="score-display">Puntaje: <span id="score">0</span></div>
-        </div>
-        
-        <div class="progress-bar">
-            <div class="progress" id="progress"></div>
-        </div>
-        
-        <div class="question-container">
-            <div class="question-number">Pregunta <span id="q-number">1</span></div>
-            <div class="question-text" id="question">¿Qué componente en una solución se encuentra en mayor proporción?</div>
-            
-            <div class="options">
-                <div class="option" data-option="a">
-                    <div class="option-prefix">A</div>
-                    <div class="option-text">Soluto</div>
-                </div>
-                <div class="option" data-option="b">
-                    <div class="option-prefix">B</div>
-                    <div class="option-text">Disolvente</div>
-                </div>
-                <div class="option" data-option="c">
-                    <div class="option-prefix">C</div>
-                    <div class="option-text">Ambos están en igual proporción</div>
-                </div>
-                <div class="option" data-option="d">
-                    <div class="option-prefix">D</div>
-                    <div class="option-text">Depende de la solución</div>
-                </div>
-            </div>
-            
-            <div class="explanation-container" id="explanation-container">
-                <h3><i class="fas fa-info-circle"></i> Explicación</h3>
-                <p id="explanation-text"></p>
-            </div>
-        </div>
-        
-        <div class="controls">
-            <button id="next-btn"><i class="fas fa-arrow-right"></i> Siguiente</button>
-        </div>
-        
-        <div class="result-container" id="result-container">
-            <h2><i class="fas fa-trophy"></i> ¡Quiz Completado!</h2>
-            <div class="score" id="final-score">0</div>
-            <div class="message" id="result-message">¡Buen trabajo! Sigue estudiando para mejorar aún más.</div>
-            <button id="restart-btn"><i class="fas fa-redo"></i> Volver a Jugar</button>
-        </div>
+  <button id="back-btn" onclick="showMenu()">← Menú</button>
+  
+  <div class="container">
+    <h1>🔬 Quiz de Ciencias</h1>
+
+    <!-- Menú principal -->
+    <div id="menu" class="menu">
+      <div class="card bio" onclick="startQuiz('Biología')">
+        <h2>Biología</h2>
+        <p>20 preguntas</p>
+      </div>
+      <div class="card fis" onclick="startQuiz('Física')">
+        <h2>Física</h2>
+        <p>20 preguntas</p>
+      </div>
+      <div class="card qui" onclick="startQuiz('Química')">
+        <h2>Química</h2>
+        <p>20 preguntas</p>
+      </div>
     </div>
-    
-    <div class="feedback" id="feedback"></div>
 
-    <script>
-        // Preguntas del quiz (40 preguntas del documento)
-        const questions = [
-            {
-                question: "¿Qué componente en una solución se encuentra en mayor proporción?",
-                options: [
-                    "Soluto",
-                    "Disolvente",
-                    "Ambos están en igual proporción",
-                    "Depende de la solución"
-                ],
-                answer: 1,
-                explanation: "En una solución, el disolvente es el componente que se encuentra en mayor cantidad, siendo el medio donde se disuelve el soluto."
-            },
-            {
-                question: "¿Cuál de las siguientes opciones describe mejor una solución homogénea?",
-                options: [
-                    "Una mezcla donde se distinguen claramente sus componentes",
-                    "Una mezcla donde los componentes están distribuidos uniformemente a nivel molecular",
-                    "Una mezcla de dos líquidos que no se mezclan",
-                    "Una mezcla de sólidos en un líquido donde se pueden ver los sólidos"
-                ],
-                answer: 1,
-                explanation: "Una solución homogénea es una mezcla uniforme donde el soluto está completamente disuelto en el disolvente a nivel molecular, sin que se distingan sus componentes."
-            },
-            {
-                question: "¿Cuál de las siguientes es una solución gaseosa?",
-                options: [
-                    "Aire",
-                    "Sal en agua",
-                    "Alcohol en agua",
-                    "Arena en agua"
-                ],
-                answer: 0,
-                explanation: "El aire es una mezcla homogénea de gases (nitrógeno, oxígeno, etc.), por lo tanto es una solución gaseosa."
-            },
-            {
-                question: "¿Cómo se clasificaría una solución que contiene más soluto del que puede disolverse a una temperatura determinada?",
-                options: [
-                    "Diluida",
-                    "Concentrada",
-                    "Saturada",
-                    "Sobresaturada"
-                ],
-                answer: 3,
-                explanation: "Una solución sobresaturada contiene más soluto del que normalmente puede disolverse en un disolvente a una temperatura dada, y es inestable."
-            },
-            {
-                question: "Clasifiquemos las siguientes soluciones según la naturaleza del soluto y del disolvente: ¿Cuál describe mejor una solución homogénea?",
-                options: [
-                    "Una mezcla donde se distinguen claramente sus componentes",
-                    "Una mezcla donde los componentes están distribuidos uniformemente a nivel molecular",
-                    "Una mezcla de dos líquidos que no se mezclan",
-                    "Una mezcla de sólidos en un líquido donde se pueden ver los sólidos"
-                ],
-                answer: 1,
-                explanation: "Esta descripción corresponde exactamente a una solución homogénea, donde el soluto y disolvente están mezclados uniformemente."
-            },
-            {
-                question: "¿Qué tipo de solución se obtiene al disolver alcohol en agua?",
-                options: [
-                    "Sólido en líquido",
-                    "Líquido en líquido",
-                    "Gas en líquido",
-                    "Sólido en sólido"
-                ],
-                answer: 1,
-                explanation: "Tanto el alcohol como el agua son líquidos, por lo que al disolverse forman una solución líquida en líquido."
-            },
-            {
-                question: "¿Cuál de las siguientes interacciones es esencial para la disolución de un soluto en un disolvente?",
-                options: [
-                    "Solo soluto-soluto",
-                    "Solo disolvente-disolvente",
-                    "Disolvente-soluto",
-                    "Ninguna de las anteriores"
-                ],
-                answer: 2,
-                explanation: "Para que ocurra la disolución, las moléculas del disolvente deben interactuar con las del soluto, rompiendo las fuerzas intermoleculares del soluto y rodeándolo."
-            },
-            {
-                question: "Según la regla de solubilidad \"lo similar disuelve a lo similar\", ¿qué disolvente es más adecuado para disolver aceites?",
-                options: [
-                    "Agua",
-                    "Etanol",
-                    "Hexano",
-                    "Ácido clorhídrico"
-                ],
-                answer: 2,
-                explanation: "Los aceites son compuestos no polares. Según la regla, un disolvente no polar como el hexano es el más adecuado para disolverlos."
-            },
-            {
-                question: "¿Por qué el azúcar se disuelve fácilmente en agua, pero no en aceite?",
-                options: [
-                    "Porque el agua es menos densa",
-                    "Porque ambos son solventes polares",
-                    "Porque el agua es un disolvente polar y el aceite es no polar",
-                    "Porque el aceite tiene mayor punto de ebullición"
-                ],
-                answer: 2,
-                explanation: "El azúcar es polar y forma enlaces de hidrógeno con el agua (polar). El aceite es no polar, por lo que no interactúa favorablemente con el azúcar."
-            },
-            {
-                question: "¿Qué factor no afecta la solubilidad de un gas en un líquido?",
-                options: [
-                    "Temperatura",
-                    "Presión",
-                    "Naturaleza del soluto y solvente",
-                    "Color del solvente"
-                ],
-                answer: 3,
-                explanation: "El color del solvente es una propiedad física que no influye en la capacidad de un gas para disolverse en un líquido."
-            },
-            {
-                question: "¿Cuál de las siguientes soluciones tiene mayor concentración?",
-                options: [
-                    "10 g de NaCl en 100 mL de agua",
-                    "15 g de NaCl en 200 mL de agua",
-                    "5 g de NaCl en 40 mL de agua",
-                    "20 g de NaCl en 250 mL de agua"
-                ],
-                answer: 2,
-                explanation: "Calculando el porcentaje en masa/volumen: a) 10%, b) 7.5%, c) 12.5%, d) 8%. La opción c) tiene la mayor concentración."
-            },
-            {
-                question: "¿Cuál es la diferencia entre una sustancia pura y una mezcla?",
-                options: [
-                    "Una sustancia pura tiene composición variable, mientras que una mezcla tiene composición fija.",
-                    "Una sustancia pura tiene propiedades constantes, mientras que una mezcla puede tener propiedades de sus componentes.",
-                    "Una sustancia pura siempre es un líquido, mientras que una mezcla puede ser sólida o gaseosa.",
-                    "No hay diferencia, son términos intercambiables."
-                ],
-                answer: 1,
-                explanation: "Una sustancia pura tiene una composición fija y propiedades constantes. Una mezcla combina dos o más sustancias, mostrando propiedades de cada una."
-            },
-            {
-                question: "¿Qué criterios se utilizan para establecer la clasificación de las mezclas?",
-                options: [
-                    "Color y olor",
-                    "Tamaño de partícula y homogeneidad",
-                    "Densidad y punto de ebullición",
-                    "Solubilidad y conductividad"
-                ],
-                answer: 1,
-                explanation: "Las mezclas se clasifican principalmente en homogéneas (uniformes) y heterogéneas (no uniformes), basándose en el tamaño de partícula y la distribución de los componentes."
-            },
-            {
-                question: "¿Cuál de las siguientes es una disolución?",
-                options: [
-                    "Agua con arena",
-                    "Jugo de frutas con pulpa",
-                    "Agua con sal completamente disuelta",
-                    "Leche"
-                ],
-                answer: 2,
-                explanation: "Una disolución (o solución) es una mezcla homogénea. La sal completamente disuelta en agua forma una solución. Las otras opciones son mezclas heterogéneas o coloides."
-            },
-            {
-                question: "¿Qué es el soluto y qué el disolvente en una solución?",
-                options: [
-                    "El soluto es el componente en menor cantidad, y el disolvente es el que está en mayor cantidad.",
-                    "El soluto es el componente en mayor cantidad, y el disolvente es el que está en menor cantidad.",
-                    "El soluto es siempre un sólido, y el disolvente siempre un líquido.",
-                    "El soluto es el que se disuelve, y el disolvente es el que cambia de estado."
-                ],
-                answer: 0,
-                explanation: "En una solución, el soluto es la sustancia que se disuelve, normalmente en menor cantidad, mientras que el disolvente es el medio donde se disuelve, en mayor cantidad."
-            },
-            {
-                question: "Identifica soluto y disolvente en una mezcla de azúcar disuelta en agua.",
-                options: [
-                    "Soluto: agua; Disolvente: azúcar",
-                    "Soluto: azúcar; Disolvente: agua",
-                    "Ambos son solutos",
-                    "Ambos son disolventes"
-                ],
-                answer: 1,
-                explanation: "El azúcar se disuelve en el agua, por lo tanto es el soluto. El agua es el medio donde se disuelve, por lo tanto es el disolvente."
-            },
-            {
-                question: "Al agregar un soluto no volátil como la sal (NaCl) al agua, ¿qué le sucede al punto de ebullición de la solución?",
-                options: [
-                    "Se vuelve inestable",
-                    "Disminuye",
-                    "Aumenta",
-                    "Permanece igual"
-                ],
-                answer: 2,
-                explanation: "La adición de un soluto no volátil eleva el punto de ebullición de la solución, un fenómeno conocido como elevación del punto de ebullición."
-            },
-            {
-                question: "¿Por qué se utiliza la prueba de la transparencia para diferenciar tipos de mezclas?",
-                options: [
-                    "Porque permite medir la densidad de la mezcla",
-                    "Porque todas las mezclas son transparentes",
-                    "Porque permite observar si los componentes se ven a simple vista o con un microscopio",
-                    "Porque permite identificar mezclas homogéneas (transparentes) de heterogéneas (turbias u opacas)"
-                ],
-                answer: 3,
-                explanation: "La transparencia es una propiedad visual que ayuda a clasificar mezclas: las homogéneas son claras y uniformes, mientras que las heterogéneas suelen ser turbias."
-            },
-            {
-                question: "En una solución de agua salada, ¿qué componente es el soluto y cuál es el disolvente?",
-                options: [
-                    "Ambos son disolventes",
-                    "Ambos son solutos",
-                    "La sal es el soluto y el agua es el disolvente",
-                    "El agua es el soluto y la sal es el disolvente"
-                ],
-                answer: 2,
-                explanation: "En una solución de agua salada, la sal se disuelve en el agua. Por lo tanto, la sal es el soluto y el agua es el disolvente."
-            },
-            {
-                question: "Una solución se describe como 'saturada'. ¿Qué significa esto?",
-                options: [
-                    "El disolvente se ha evaporado por completo",
-                    "Se ha añadido un catalizador para acelerar la disolución",
-                    "La solución contiene la máxima cantidad de soluto que puede disolverse a una temperatura dada",
-                    "Solución muy concentrada"
-                ],
-                answer: 2,
-                explanation: "Una solución saturada está en equilibrio, conteniendo la máxima cantidad de soluto que puede disolverse en un disolvente a una temperatura específica."
-            },
-            {
-                question: "¿Cuál de las siguientes es la definición de una solución?",
-                options: [
-                    "Una mezcla heterogénea de dos o más sustancias",
-                    "Una mezcla donde el soluto se separa del disolvente con el tiempo",
-                    "Una mezcla homogénea de dos o más sustancias, donde el soluto está disuelto en el disolvente",
-                    "Una mezcla de sólidos en un líquido donde se pueden ver los sólidos"
-                ],
-                answer: 2,
-                explanation: "Una solución es una mezcla homogénea donde las partículas del soluto están dispersas uniformemente en el disolvente a nivel molecular."
-            },
-            {
-                question: "En una solución, ¿cuál de los componentes se encuentra, generalmente, en mayor cantidad?",
-                options: [
-                    "El soluto",
-                    "El disolvente",
-                    "Ambos están en igual proporción",
-                    "Ninguno de los anteriores"
-                ],
-                answer: 1,
-                explanation: "El disolvente es el componente principal de una solución, presente en mayor cantidad para disolver al soluto."
-            },
-            {
-                question: "¿Cómo se clasifica una solución que tiene una pequeña cantidad de soluto en relación con el disolvente?",
-                options: [
-                    "Concentrada",
-                    "Saturada",
-                    "Sobresaturada",
-                    "Diluida"
-                ],
-                answer: 3,
-                explanation: "Una solución diluida contiene una pequeña cantidad de soluto en comparación con la cantidad de disolvente."
-            },
-            {
-                question: "Una solución sobresaturada es aquella que contiene:",
-                options: [
-                    "Una pequeña cantidad de soluto",
-                    "La máxima cantidad de soluto que el disolvente puede disolver",
-                    "Más soluto del que puede disolverse en una solución saturada a una temperatura dada",
-                    "Una cantidad considerable de soluto que no ha alcanzado el límite de saturación"
-                ],
-                answer: 2,
-                explanation: "Una solución sobresaturada contiene más soluto del que normalmente podría disolverse en condiciones de equilibrio, y es inestable."
-            },
-            {
-                question: "El aire que respiramos es un ejemplo de una solución:",
-                options: [
-                    "Líquida",
-                    "Gaseosa",
-                    "Sólida",
-                    "Coloidal"
-                ],
-                answer: 1,
-                explanation: "El aire es una mezcla homogénea de gases (nitrógeno, oxígeno, etc.), por lo tanto es una solución gaseosa."
-            },
-            {
-                question: "Según el documento, un ejemplo de una solución líquida es:",
-                options: [
-                    "Acero",
-                    "Aire",
-                    "Salmuera",
-                    "Arena en agua"
-                ],
-                answer: 2,
-                explanation: "La salmuera es una solución de sal (cloruro de sodio) disuelta en agua, ambas sustancias líquidas."
-            },
-            {
-                question: "La solubilidad de la mayoría de los sólidos en líquidos:",
-                options: [
-                    "Aumenta al aumentar la temperatura",
-                    "Disminuye al aumentar la temperatura",
-                    "No se ve afectada por la temperatura",
-                    "Depende de la presión"
-                ],
-                answer: 0,
-                explanation: "Para la mayoría de los sólidos, al aumentar la temperatura, las moléculas del disolvente se mueven más rápido, lo que facilita la disolución del soluto."
-            },
-            {
-                question: "Según el documento, ¿qué le ocurre a la solubilidad de los gases en líquidos cuando la temperatura aumenta?",
-                options: [
-                    "Aumenta",
-                    "Disminuye",
-                    "Permanece constante",
-                    "Primero aumenta y luego disminuye"
-                ],
-                answer: 1,
-                explanation: "A medida que aumenta la temperatura, la energía cinética de las moléculas de gas aumenta, lo que hace que escapen más fácilmente del líquido, reduciendo su solubilidad."
-            },
-            {
-                question: "¿Cuál es la regla de solubilidad conocida como \"Lo similar disuelve a lo similar\"?",
-                options: [
-                    "Sustancias con diferentes características químicas se disuelven mutuamente",
-                    "Las moléculas polares disuelven solutos no polares",
-                    "Las moléculas polares disuelven solutos polares, y las no polares disuelven solutos no polares",
-                    "Los disolventes con mayor densidad disuelven a solutos menos densos"
-                ],
-                answer: 2,
-                explanation: "Esta regla se basa en la polaridad de las moléculas. Las sustancias con polaridades similares tienden a disolverse entre sí debido a sus interacciones intermoleculares compatibles."
-            },
-            {
-                question: "El proceso de solvatación se refiere a:",
-                options: [
-                    "La evaporación de un soluto",
-                    "La ruptura de las fuerzas de unión entre las moléculas de soluto",
-                    "El proceso donde las moléculas de disolvente rodean a los iones de un soluto, separándolos",
-                    "La formación de un precipitado en el fondo del recipiente"
-                ],
-                answer: 2,
-                explanation: "La solvatación es el proceso en el que las moléculas del disolvente interactúan con y rodean a las partículas del soluto, estabilizándolas y manteniéndolas disueltas."
-            },
-            {
-                question: "¿Cuál de las siguientes interacciones moleculares es la responsable de que la sal se disuelva en el agua?",
-                options: [
-                    "Soluto-soluto",
-                    "Disolvente-disolvente",
-                    "Disolvente-soluto",
-                    "Ninguna de las anteriores"
-                ],
-                answer: 2,
-                explanation: "La disolución de la sal en agua ocurre cuando las moléculas polares de agua (disolvente) interactúan con los iones de la sal (soluto), superando las fuerzas de atracción entre los iones en el cristal."
-            },
-            {
-                question: "¿Qué propiedad de una solución indica que sus componentes están distribuidos de manera uniforme a nivel molecular, sin que se puedan distinguir a simple vista?",
-                options: [
-                    "Transparencia",
-                    "Estabilidad",
-                    "Homogeneidad",
-                    "Solubilidad"
-                ],
-                answer: 2,
-                explanation: "La homogeneidad es la propiedad que indica que una mezcla tiene una composición uniforme en toda su extensión, con partículas distribuidas a nivel molecular."
-            },
-            {
-                question: "¿Qué factor no afecta la solubilidad de un gas en un líquido, según el documento?",
-                options: [
-                    "Temperatura",
-                    "Presión",
-                    "Naturaleza del soluto y solvente",
-                    "Color del disolvente"
-                ],
-                answer: 3,
-                explanation: "El color del disolvente es una propiedad física que no influye en la capacidad de un gas para disolverse en un líquido."
-            },
-            {
-                question: "Si un estudiante intenta disolver 400 g de azúcar en 100 g de agua a 20°C, sabiendo que la solubilidad a esa temperatura es de 200 g por 100 g de agua, ¿qué tipo de solución obtendrá?",
-                options: [
-                    "Diluida",
-                    "Concentrada",
-                    "Saturada",
-                    "Sobresaturada"
-                ],
-                answer: 3,
-                explanation: "Si se intenta disolver más soluto (400 g) del que puede disolverse normalmente (200 g) en 100 g de agua, se obtiene una solución sobresaturada."
-            },
-            {
-                question: "Según la Ley de Henry, la solubilidad de un gas en un líquido es:",
-                options: [
-                    "Directamente proporcional a la temperatura",
-                    "Inversamente proporcional a la presión parcial del gas",
-                    "Directamente proporcional a la presión parcial del gas sobre la solución",
-                    "Inversamente proporcional a la temperatura"
-                ],
-                answer: 2,
-                explanation: "La Ley de Henry establece que la cantidad de gas disuelto en un líquido es directamente proporcional a la presión parcial del gas sobre el líquido."
-            },
-            {
-                question: "¿Por qué el azúcar se disuelve fácilmente en agua, pero no en aceite?",
-                options: [
-                    "Porque ambos son solventes polares",
-                    "Porque el agua es menos densa que el azúcar",
-                    "Porque el agua es un disolvente polar y el aceite es no polar",
-                    "Porque el aceite tiene un mayor punto de ebullición"
-                ],
-                answer: 2,
-                explanation: "El azúcar es polar y forma enlaces de hidrógeno con el agua (polar). El aceite es no polar, por lo que no interactúa favorablemente con el azúcar."
-            },
-            {
-                question: "¿Qué tipo de solución se obtiene al disolver alcohol en agua?",
-                options: [
-                    "Sólido en líquido",
-                    "Líquido en líquido",
-                    "Gas en líquido",
-                    "Sólido en sólido"
-                ],
-                answer: 1,
-                explanation: "Tanto el alcohol como el agua son líquidos, por lo que al disolverse forman una solución líquida en líquido."
-            },
-            {
-                question: "En el contexto de las soluciones, una aleación es un ejemplo de:",
-                options: [
-                    "Una solución líquida",
-                    "Una solución gaseosa",
-                    "Una solución sólida",
-                    "Una mezcla heterogénea"
-                ],
-                answer: 2,
-                explanation: "Una aleación es una mezcla homogénea de dos o más metales (sólidos), por lo que es una solución sólida."
-            },
-            {
-                question: "¿Cuál de las siguientes afirmaciones sobre las soluciones es incorrecta?",
-                options: [
-                    "Las soluciones son mezclas homogéneas y transparentes",
-                    "Las soluciones son estables y no se separan con el tiempo",
-                    "Las partículas del soluto están distribuidas uniformemente",
-                    "Todas las soluciones tienen color"
-                ],
-                answer: 3,
-                explanation: "No todas las soluciones tienen color; muchas son incoloras, como el agua pura o una solución de sal en agua."
-            },
-            {
-                question: "En un café fuerte, ¿qué componente es el soluto y cuál es el disolvente?",
-                options: [
-                    "El agua es el soluto y el café en polvo es el disolvente",
-                    "Ambos son disolventes",
-                    "El café en polvo es el soluto y el agua es el disolvente",
-                    "No se puede determinar"
-                ],
-                answer: 2,
-                explanation: "En una taza de café, el café en polvo (o líquido concentrado) se disuelve en el agua. Por lo tanto, el café es el soluto y el agua es el disolvente."
-            }
-        ];
+    <!-- Quiz -->
+    <div id="quiz">
+      <div class="quiz-header">
+        <div class="subject-indicator" id="subject-indicator">Biología</div>
+        <div class="timer" id="timer">15s</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div id="question">...</div>
+      <div class="options" id="options"></div>
+      <div id="score-display">Puntaje: <span id="score">0</span></div>
+    </div>
 
-        // Variables del juego
-        const questionElement = document.getElementById('question');
-        const optionsContainer = document.querySelector('.options');
-        const nextButton = document.getElementById('next-btn');
-        const restartButton = document.getElementById('restart-btn');
-        const currentQuestionElement = document.getElementById('current-question');
-        const totalQuestionsElement = document.getElementById('total-questions');
-        const qNumberElement = document.getElementById('q-number');
-        const timerElement = document.getElementById('timer');
-        const scoreElement = document.getElementById('score');
-        const finalScoreElement = document.getElementById('final-score');
-        const resultContainer = document.getElementById('result-container');
-        const resultMessage = document.getElementById('result-message');
-        const progressBar = document.getElementById('progress');
-        const feedbackElement = document.getElementById('feedback');
-        const explanationContainer = document.getElementById('explanation-container');
-        const explanationText = document.getElementById('explanation-text');
-        
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let timer;
-        let timeLeft = 30;
-        let selectedOption = null;
-        let shuffledQuestions = [];
+    <!-- Resultados -->
+    <div id="results">
+      <h2>🎉 ¡Quiz Finalizado!</h2>
+      <div id="final-score">Puntaje: 0/20</div>
+      <div id="message">¡Sigue practicando!</div>
+      <button class="btn" onclick="showMenu()">Volver al Menú</button>
+      <div class="explanation" id="explanation">
+        <!-- Aquí se mostrarán las explicaciones -->
+      </div>
+    </div>
+  </div>
 
-        // Inicializar el quiz
-        function initQuiz() {
-            currentQuestionIndex = 0;
-            score = 0;
-            scoreElement.textContent = score;
-            shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
-            totalQuestionsElement.textContent = shuffledQuestions.length;
-            showQuestion();
-            startTimer();
+  <script>
+    // === PREGUNTAS ===
+    const preguntas = {
+      Biología: [
+        { q: "¿Cuál es la unidad básica de la vida?", a: "Célula", o: ["Átomo", "Molécula", "Célula", "Tejido"] },
+        { q: "¿Qué orgánulo es conocido como la 'central energética' de la célula?", a: "Mitocondria", o: ["Núcleo", "Ribosoma", "Mitocondria", "Lisosoma"] },
+        { q: "¿Cuál es el pigmento que permite la fotosíntesis en las plantas?", a: "Clorofila", o: ["Caroteno", "Antocianina", "Clorofila", "Xantofila"] },
+        { q: "¿Cuántos cromosomas tiene un ser humano?", a: "46", o: ["23", "44", "46", "48"] },
+        { q: "¿Qué tipo de sangre es donante universal?", a: "O negativo", o: ["A+", "B-", "AB+", "O negativo"] },
+        { q: "¿Cuál es el órgano más grande del cuerpo humano?", a: "Piel", o: ["Hígado", "Cerebro", "Piel", "Corazón"] },
+        { q: "¿Qué proceso convierte la glucosa en energía en ausencia de oxígeno?", a: "Fermentación", o: ["Fotosíntesis", "Respiración aeróbica", "Fermentación", "Gluconeogénesis"] },
+        { q: "¿Qué ADN se hereda solo de la madre?", a: "ADN mitocondrial", o: ["ADN nuclear", "ADN plasmídico", "ADN mitocondrial", "ADN ribosómico"] },
+        { q: "¿Qué estructura separa el contenido celular del exterior?", a: "Membrana plasmática", o: ["Pared celular", "Núcleo", "Membrana plasmática", "Citoplasma"] },
+        { q: "¿Qué tipo de células producen anticuerpos?", a: "Linfocitos B", o: ["Neuronas", "Eritrocitos", "Linfocitos B", "Plaquetas"] },
+        { q: "¿Cuál es el gas que las plantas liberan durante la fotosíntesis?", a: "Oxígeno", o: ["Dióxido de carbono", "Nitrógeno", "Oxígeno", "Hidrógeno"] },
+        { q: "¿Qué sistema del cuerpo controla las hormonas?", a: "Sistema endocrino", o: ["Sistema nervioso", "Sistema circulatorio", "Sistema endocrino", "Sistema inmunológico"] },
+        { q: "¿Qué molécula transporta la información genética?", a: "ADN", o: ["ARN", "Proteína", "ADN", "Lípido"] },
+        { q: "¿Qué proceso permite la división celular en organismos eucariotas?", a: "Mitosis", o: ["Meiosis", "Fisión binaria", "Mitosis", "Gemación"] },
+        { q: "¿Qué parte del ojo contiene los fotorreceptores?", a: "Retina", o: ["Córnea", "Iris", "Retina", "Cristalino"] },
+        { q: "¿Qué vitamina se sintetiza con la exposición al sol?", a: "Vitamina D", o: ["Vitamina A", "Vitamina C", "Vitamina D", "Vitamina K"] },
+        { q: "¿Qué tipo de nutrición tienen los hongos?", a: "Heterótrofa por absorción", o: ["Autótrofa", "Heterótrofa por ingestión", "Heterótrofa por absorción", "Quimiosintética"] },
+        { q: "¿Cuál es el principal componente del cabello humano?", a: "Queratina", o: ["Colágeno", "Elastina", "Queratina", "Melanina"] },
+        { q: "¿Qué glándula produce insulina?", a: "Páncreas", o: ["Tiroides", "Hipófisis", "Páncreas", "Suprarrenal"] },
+        { q: "¿Qué tipo de células no tienen núcleo?", a: "Glóbulos rojos", o: ["Neuronas", "Glóbulos rojos", "Células epiteliales", "Óvulos"] }
+      ],
+      Física: [
+        { q: "¿Cuál es la unidad de fuerza en el SI?", a: "Newton", o: ["Joule", "Watt", "Newton", "Pascal"] },
+        { q: "¿Qué ley establece que la fuerza es igual a masa por aceleración?", a: "Segunda ley de Newton", o: ["Primera ley", "Segunda ley de Newton", "Tercera ley", "Ley de gravitación"] },
+        { q: "¿Qué tipo de energía posee un cuerpo en movimiento?", a: "Energía cinética", o: ["Potencial", "Térmica", "Cinética", "Química"] },
+        { q: "¿Cuál es la velocidad de la luz en el vacío?", a: "300,000 km/s", o: ["150,000 km/s", "300,000 km/s", "500,000 km/s", "1,000,000 km/s"] },
+        { q: "¿Qué partícula tiene carga negativa?", a: "Electrón", o: ["Protón", "Neutrón", "Electrón", "Positrón"] },
+        { q: "¿Qué fenómeno explica el arcoíris?", a: "Refracción y reflexión", o: ["Difracción", "Interferencia", "Refracción y reflexión", "Polarización"] },
+        { q: "¿Qué magnitud se mide en hercios (Hz)?", a: "Frecuencia", o: ["Longitud", "Velocidad", "Frecuencia", "Energía"] },
+        { q: "¿Qué ley describe la atracción entre masas?", a: "Ley de gravitación universal", o: ["Ley de Coulomb", "Ley de Ohm", "Ley de gravitación universal", "Ley de Hooke"] },
+        { q: "¿Cuál es la energía almacenada en un resorte comprimido?", a: "Energía potencial elástica", o: ["Cinética", "Térmica", "Potencial elástica", "Potencial gravitatoria"] },
+        { q: "¿Qué ocurre en un cortocircuito?", a: "Baja resistencia y alta corriente", o: ["Alta resistencia", "Baja corriente", "Baja resistencia y alta corriente", "Ninguna corriente"] },
+        { q: "¿Qué tipo de espejo produce imágenes virtuales y derechas?", a: "Plano", o: ["Cóncavo", "Convexo", "Plano", "Parabólico"] },
+        { q: "¿Cuál es la unidad de resistencia eléctrica?", a: "Ohm", o: ["Volt", "Ampere", "Ohm", "Faradio"] },
+        { q: "¿Qué principio explica por qué un barco flota?", a: "Principio de Arquímedes", o: ["Pascal", "Bernoulli", "Arquímedes", "Newton"] },
+        { q: "¿Qué es la inercia?", a: "Resistencia al cambio de movimiento", o: ["Fuerza de fricción", "Resistencia al cambio de movimiento", "Energía cinética", "Aceleración"] },
+        { q: "¿Qué tipo de onda es el sonido?", a: "Mecánica longitudinal", o: ["Electromagnética", "Transversal", "Mecánica longitudinal", "Estacionaria"] },
+        { q: "¿Qué magnitud relaciona trabajo y tiempo?", a: "Potencia", o: ["Energía", "Fuerza", "Potencia", "Impulso"] },
+        { q: "¿Qué ocurre con la presión al aumentar la profundidad en un fluido?", a: "Aumenta", o: ["Disminuye", "Se mantiene", "Aumenta", "Varía aleatoriamente"] },
+        { q: "¿Cuál es el símbolo del campo magnético?", a: "B", o: ["E", "H", "B", "μ"] },
+        { q: "¿Qué ley relaciona voltaje, corriente y resistencia?", a: "Ley de Ohm", o: ["Ley de Faraday", "Ley de Ohm", "Ley de Coulomb", "Ley de Lenz"] },
+        { q: "¿Qué partícula es responsable de la corriente en los metales?", a: "Electrón", o: ["Protón", "Neutrón", "Electrón", "Ión"] }
+      ],
+      Química: [
+        { q: "¿Cuál es el símbolo químico del oro?", a: "Au", o: ["Ag", "Au", "Fe", "O"] },
+        { q: "¿Qué tipo de enlace se forma al compartir electrones?", a: "Covalente", o: ["Iónico", "Metálico", "Covalente", "Puente de hidrógeno"] },
+        { q: "¿Cuál es el pH del agua pura?", a: "7", o: ["0", "7", "14", "10"] },
+        { q: "¿Qué gas es liberado en la combustión?", a: "Dióxido de carbono", o: ["Oxígeno", "Hidrógeno", "Dióxido de carbono", "Nitrógeno"] },
+        { q: "¿Cuántos electrones tiene el oxígeno en su última capa?", a: "6", o: ["2", "4", "6", "8"] },
+        { q: "¿Qué elemento es esencial en los compuestos orgánicos?", a: "Carbono", o: ["Hidrógeno", "Oxígeno", "Carbono", "Nitrógeno"] },
+        { q: "¿Qué ocurre en una reacción exotérmica?", a: "Libera calor", o: ["Absorbe calor", "No cambia temperatura", "Libera calor", "Libera luz únicamente"] },
+        { q: "¿Cuál es el estado de la materia con forma y volumen definidos?", a: "Sólido", o: ["Líquido", "Gas", "Plasma", "Sólido"] },
+        { q: "¿Qué partículas subatómicas forman el núcleo?", a: "Protones y neutrones", o: ["Electrones y protones", "Neutrones y electrones", "Protones y neutrones", "Solo protones"] },
+        { q: "¿Qué tipo de mezcla es el aire?", a: "Homogénea", o: ["Heterogénea", "Homogénea", "Coloide", "Suspensión"] },
+        { q: "¿Cuál es el ácido en el jugo gástrico?", a: "Ácido clorhídrico", o: ["Ácido sulfúrico", "Ácido nítrico", "Ácido acético", "Ácido clorhídrico"] },
+        { q: "¿Qué indica el número atómico?", a: "Número de protones", o: ["Masa atómica", "Número de neutrones", "Número de electrones", "Número de protones"] },
+        { q: "¿Qué gas es más abundante en la atmósfera?", a: "Nitrógeno", o: ["Oxígeno", "Dióxido de carbono", "Nitrógeno", "Argón"] },
+        { q: "¿Qué tipo de reacción es la fotosíntesis?", a: "Endotérmica", o: ["Exotérmica", "Endotérmica", "Redox", "Ácido-base"] },
+        { q: "¿Cuántos estados de oxidación tiene el hierro comúnmente?", a: "+2 y +3", o: ["+1", "+2 y +3", "+4", "+5"] },
+        { q: "¿Qué compuesto se forma al reaccionar un ácido y una base?", a: "Sal y agua", o: ["Gas", "Sal y agua", "Oxígeno", "Hidrógeno"] },
+        { q: "¿Cuál es el nombre del proceso que separa mezclas por ebullición?", a: "Destilación", o: ["Filtración", "Cristalización", "Destilación", "Cromatografía"] },
+        { q: "¿Qué elemento tiene número atómico 1?", a: "Hidrógeno", o: ["Helio", "Litio", "Hidrógeno", "Oxígeno"] },
+        { q: "¿Qué tipo de enlace mantiene unidas las moléculas de agua?", a: "Puente de hidrógeno", o: ["Iónico", "Covalente", "Metálico", "Puente de hidrógeno"] },
+        { q: "¿Qué ley establece que la materia no se crea ni se destruye?", a: "Ley de conservación de la masa", o: ["Ley de Boyle", "Ley de conservación de la masa", "Ley de Avogadro", "Ley de Dalton"] }
+      ]
+    };
+
+    // === Estado del juego ===
+    let currentSubject = '';
+    let shuffledQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 15;
+
+    // === Funciones ===
+    function showMenu() {
+      document.getElementById('menu').style.display = 'flex';
+      document.getElementById('quiz').style.display = 'none';
+      document.getElementById('results').style.display = 'none';
+      clearInterval(timer);
+    }
+
+    function startQuiz(subject) {
+      currentSubject = subject;
+      const allQuestions = [...preguntas[subject]];
+      shuffledQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 20);
+      currentQuestionIndex = 0;
+      score = 0;
+      loadQuestion();
+      document.getElementById('menu').style.display = 'none';
+      document.getElementById('quiz').style.display = 'block';
+      document.getElementById('subject-indicator').textContent = subject;
+      document.getElementById('score').textContent = score;
+    }
+
+    function loadQuestion() {
+      if (currentQuestionIndex >= shuffledQuestions.length) {
+        showResults();
+        return;
+      }
+
+      const q = shuffledQuestions[currentQuestionIndex];
+      document.getElementById('question').textContent = q.q;
+      const optionsContainer = document.getElementById('options');
+      optionsContainer.innerHTML = '';
+      q.o.forEach(opt => {
+        const div = document.createElement('div');
+        div.classList.add('option');
+        div.textContent = opt;
+        div.onclick = () => selectOption(opt, q.a);
+        optionsContainer.appendChild(div);
+      });
+
+      // Progreso
+      const progressPercent = ((currentQuestionIndex) / shuffledQuestions.length) * 100;
+      document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+
+      // Temporizador
+      timeLeft = 40;
+      document.getElementById('timer').textContent = timeLeft + 's';
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = timeLeft + 's';
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          // Tiempo agotado: respuesta incorrecta
+          const options = document.querySelectorAll('.option');
+          options.forEach(opt => {
+            if (opt.textContent === q.a) opt.classList.add('correct');
+            else opt.classList.remove('correct');
+          });
+          setTimeout(nextQuestion, 1000);
         }
+      }, 1000);
+    }
 
-        // Mostrar pregunta actual
-        function showQuestion() {
-            const question = shuffledQuestions[currentQuestionIndex];
-            questionElement.textContent = question.question;
-            qNumberElement.textContent = currentQuestionIndex + 1;
-            currentQuestionElement.textContent = currentQuestionIndex + 1;
-            
-            // Limpiar opciones anteriores
-            optionsContainer.innerHTML = '';
-            
-            // Agregar nuevas opciones
-            question.options.forEach((option, index) => {
-                const optionElement = document.createElement('div');
-                optionElement.classList.add('option');
-                optionElement.dataset.option = String.fromCharCode(97 + index); // a, b, c, d
-                optionElement.innerHTML = `
-                    <div class="option-prefix">${String.fromCharCode(65 + index)}</div>
-                    <div class="option-text">${option}</div>
-                `;
-                optionElement.addEventListener('click', () => selectOption(optionElement, index));
-                optionsContainer.appendChild(optionElement);
-            });
-            
-            // Ocultar explicación
-            explanationContainer.style.display = 'none';
-            
-            // Actualizar barra de progreso
-            progressBar.style.width = `${((currentQuestionIndex) / shuffledQuestions.length) * 100}%`;
-            
-            // Reiniciar temporizador
-            timeLeft = 60;
-            timerElement.textContent = timeLeft;
-            clearInterval(timer);
-            startTimer();
-            
-            // Resetear selección
-            selectedOption = null;
-            nextButton.disabled = true;
+    function selectOption(selected, correct) {
+      clearInterval(timer);
+      const options = document.querySelectorAll('.option');
+      options.forEach(opt => {
+        if (opt.textContent === correct) {
+          opt.classList.add('correct');
+        } else if (opt.textContent === selected && selected !== correct) {
+          opt.classList.add('incorrect');
         }
+        opt.style.pointerEvents = 'none';
+      });
 
-        // Seleccionar una opción
-        function selectOption(optionElement, index) {
-            // Si ya se seleccionó una opción, no hacer nada
-            if (selectedOption !== null) return;
-            
-            selectedOption = index;
-            
-            // Marcar la opción seleccionada
-            document.querySelectorAll('.option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            optionElement.classList.add('selected');
-            
-            // Detener el temporizador
-            clearInterval(timer);
-            
-            // Verificar respuesta
-            const correct = shuffledQuestions[currentQuestionIndex].answer === index;
-            
-            // Mostrar feedback
-            showFeedback(correct);
-            
-            // Marcar opciones correctas/incorrectas
-            document.querySelectorAll('.option').forEach((opt, i) => {
-                opt.classList.remove('selected');
-                if (i === shuffledQuestions[currentQuestionIndex].answer) {
-                    opt.classList.add('correct');
-                } else if (i === index && !correct) {
-                    opt.classList.add('incorrect');
-                }
-            });
-            
-            // Mostrar explicación
-            explanationText.textContent = shuffledQuestions[currentQuestionIndex].explanation;
-            explanationContainer.style.display = 'block';
-            
-            // Actualizar puntaje
-            if (correct) {
-                score += 10;
-                scoreElement.textContent = score;
-            }
-            
-            // Habilitar botón siguiente
-            nextButton.disabled = false;
-        }
+      if (selected === correct) {
+        score++;
+        document.getElementById('score').textContent = score;
+      }
 
-        // Mostrar feedback
-        function showFeedback(isCorrect) {
-            feedbackElement.textContent = isCorrect ? '¡Correcto! +10 puntos' : 'Incorrecto';
-            feedbackElement.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
-            feedbackElement.classList.add('show');
-            
-            // Ocultar feedback después de 2 segundos
-            setTimeout(() => {
-                feedbackElement.classList.remove('show');
-            }, 2000);
-        }
+      setTimeout(nextQuestion, 1500);
+    }
 
-        // Temporizador
-        function startTimer() {
-            timer = setInterval(() => {
-                timeLeft--;
-                timerElement.textContent = timeLeft;
-                
-                // Cambiar color cuando queda poco tiempo
-                if (timeLeft <= 5) {
-                    timerElement.style.color = '#f44336';
-                    timerElement.classList.add('pulse');
-                } else {
-                    timerElement.style.color = 'white';
-                    timerElement.classList.remove('pulse');
-                }
-                
-                // Tiempo agotado
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    timeUp();
-                }
-            }, 1000);
-        }
+    function nextQuestion() {
+      currentQuestionIndex++;
+      loadQuestion();
+    }
 
-        // Tiempo agotado
-        function timeUp() {
-            // Marcar la pregunta como incorrecta
-            document.querySelectorAll('.option').forEach((opt, i) => {
-                if (i === shuffledQuestions[currentQuestionIndex].answer) {
-                    opt.classList.add('correct');
-                }
-            });
-            
-            // Mostrar explicación
-            explanationText.textContent = shuffledQuestions[currentQuestionIndex].explanation;
-            explanationContainer.style.display = 'block';
-            
-            // Mostrar feedback
-            showFeedback(false);
-            
-            // Habilitar botón siguiente
-            nextButton.disabled = false;
-        }
+    function showResults() {
+      document.getElementById('quiz').style.display = 'none';
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('final-score').textContent = `Puntaje: ${score}/20`;
 
-        // Siguiente pregunta
-        function nextQuestion() {
-            currentQuestionIndex++;
-            
-            if (currentQuestionIndex < shuffledQuestions.length) {
-                showQuestion();
-            } else {
-                showResults();
-            }
-        }
+      let message = '';
+      if (score === 20) message = '¡Eres un genio científico! 🌟';
+      else if (score >= 15) message = '¡Excelente trabajo! 🧪';
+      else if (score >= 10) message = 'Buena base, ¡sigue aprendiendo! 📘';
+      else message = '¡No te rindas! La ciencia es para todos. 💡';
 
-        // Mostrar resultados
-        function showResults() {
-            document.querySelector('.question-container').style.display = 'none';
-            document.querySelector('.controls').style.display = 'none';
-            resultContainer.style.display = 'flex';
-            
-            finalScoreElement.textContent = score;
-            
-            // Mensaje según puntaje
-            const percentage = (score / (shuffledQuestions.length * 10)) * 100;
-            if (percentage >= 80) {
-                resultMessage.textContent = '¡Excelente! Dominas el tema de soluciones y mezclas.';
-            } else if (percentage >= 60) {
-                resultMessage.textContent = '¡Buen trabajo! Tienes buenos conocimientos, pero puedes mejorar.';
-            } else if (percentage >= 40) {
-                resultMessage.textContent = 'Está bien, pero necesitas repasar más el tema.';
-            } else {
-                resultMessage.textContent = 'Necesitas estudiar más sobre soluciones y mezclas.';
-            }
-            
-            // Actualizar barra de progreso
-            progressBar.style.width = '100%';
-        }
+      document.getElementById('message').textContent = message;
 
-        // Reiniciar quiz
-        function restartQuiz() {
-            document.querySelector('.question-container').style.display = 'flex';
-            document.querySelector('.controls').style.display = 'flex';
-            resultContainer.style.display = 'none';
-            initQuiz();
-        }
+      // Explicaciones clave (ejemplo simplificado)
+      const expText = `
+        <strong>Conceptos clave:</strong><br>
+        • En ${currentSubject}, es fundamental entender los principios básicos.<br>
+        • Revisa los errores y busca profundizar en los temas que te costaron más.<br>
+        • ¡La curiosidad es el motor de la ciencia!
+      `;
+      document.getElementById('explanation').innerHTML = expText;
+    }
 
-        // Eventos
-        nextButton.addEventListener('click', nextQuestion);
-        restartButton.addEventListener('click', restartQuiz);
-
-        // Iniciar el quiz
-        initQuiz();
-    </script>
+    // Inicio
+    showMenu();
+  </script>
 </body>
 </html>
-
-
